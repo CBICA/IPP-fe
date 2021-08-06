@@ -1,0 +1,3 @@
+[submodule "src/IPP-Experiment_Defintions"]
+	path = src/IPP-Experiment_Defintions
+	url = https://github.com/CBICA/IPP-Experiment_Defintions.git
