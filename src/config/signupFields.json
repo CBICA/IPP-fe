@@ -1,0 +1,45 @@
+[
+    {
+        "id": "institution",
+        "name": "Academic affiliation or company name",
+        "type": "text",
+        "required": true,
+        "pattern": ".*"
+    },
+    {
+        "id": "fname",
+        "name": "First name",
+        "type": "text",
+        "required": true,
+        "pattern": ".*"
+    },
+    {
+        "id": "lname",
+        "name": "Last name",
+        "type": "text",
+        "required": true,
+        "pattern": ".*"
+    },
+    {
+        "id": "intention",
+        "name": "Intended use",
+        "type": "textarea",
+        "required": true,
+        "pattern": ".*"
+    },
+    {
+        "id": "referral",
+        "name": "Where did you hear about this portal?",
+        "type": "textarea",
+        "required": true,
+        "pattern": ".*"
+    },
+    {
+        "id": "nih",
+        "name": "Is your use of the CBICA IPP related to an NIH-supported project?",
+        "type": "textarea",
+        "required": true,
+        "pattern": ".*"
+
+    }
+]
