@@ -26,7 +26,6 @@
     "test": "craco test",
     "eject": "craco eject"
   },
-  "homepage": "/IPP-fe",
   "eslintConfig": {
     "extends": [
       "react-app",
