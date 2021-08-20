@@ -85,13 +85,13 @@ function App() {
 
   const [apiUrl, setApiUrl] = useState(localStorage.getItem('api_url') || '');
   const [loggedIn, setLogin] = useState(localStorage.getItem('token') !== null);
-  const [token, setToken] = useState(localStorage.getItem('token') || '');
+  const [token, setToken] = useState(localStorage.getItem('token') || (new URLSearchParams(window.location.search).get('token') ?? ''));
   const [signup, setSignup] = useState(false);
   const [page, setPage] = useState('apps');
   const [currentApp, setApp] = useState('');
   const [experiments, setExperiments] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
-  const [user, setUser] = useState({groups: []});
+  const [user, setUser] = useState({ groups: [] });
 
   // fetch experiments
   const fetchExperiments = () => {
@@ -274,25 +274,26 @@ function App() {
               //   user_has_group = user.groups.some(x => categories[cat].groups.includes(x))
               // }
               if (!categories[cat].hasOwnProperty('groups') || (user.hasOwnProperty('groups') && user.groups.some(x => categories[cat].groups.includes(x)))) { // || user_has_group
-                  return (
-                    <li className="hover-bordered dropdown dropdown-right dropdown-hover">
-                      <a href="#">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 h-5 mr-2 stroke-current">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                        </svg>
-                        {categories[cat].label}
-                      </a>
-                      <ol className="shadow menu dropdown-content bg-base-100 w-full pl-0">
-                        <li>
-                          {categories[cat].apps.map((app: string) => (
-                            <a href="#" onClick={() => { setApp(app) }} className="block px-4 py-2 mt-2 text-sm font-semibold bg-transparent rounded dark-mode:bg-transparent dark-mode:hover:bg-gray-600 dark-mode:focus:bg-gray-600 dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:text-gray-200 md:mt-0 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline">{app}</a>
-                          ))}
-                        </li>
-                      </ol>
+                return (
+                  <li className="hover-bordered dropdown dropdown-right dropdown-hover">
+                    <a href="#">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 h-5 mr-2 stroke-current">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                      </svg>
+                      {categories[cat].label}
+                    </a>
+                    <ol className="shadow menu dropdown-content bg-base-100 w-full pl-0">
+                      <li>
+                        {categories[cat].apps.map((app: string) => (
+                          <a href="#" onClick={() => { setApp(app) }} className="block px-4 py-2 mt-2 text-sm font-semibold bg-transparent rounded dark-mode:bg-transparent dark-mode:hover:bg-gray-600 dark-mode:focus:bg-gray-600 dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:text-gray-200 md:mt-0 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline">{app}</a>
+                        ))}
+                      </li>
+                    </ol>
 
-                    </li>
-                  )
+                  </li>
+                )
               }
+              return (<div></div>)
             }
             )}
           </ul>
@@ -446,6 +447,12 @@ function App() {
                     //   console.log(app.fieldGroups.required.fields[field].type)
                   }
                 })}
+                <select name="host" className="select select-bordered select-primary w-full">
+                  <option disabled={true} selected={true}>Execute host</option>
+                  <option value="localhost">Localhost</option>
+                  <option value="cubic">CUBIC</option>
+                  <option value="cbica1">IPP server</option>
+                </select>
               </div>
               <label className="block mt-3">
                 <button className="btn btn-primary" type="submit">Submit</button>
@@ -486,19 +493,35 @@ function App() {
               <tbody>
                 {experiments.map((exp, idx) => (
                   <tr>
-                    {console.log(exp)}
                     <th>{idx + 1}</th>
                     <td>{exp['experimentName']}</td>
                     <td>{exp['experimentDescription']}</td>
                     <td>{exp['app']}</td>
                     <td>{exp['created']}</td>
-                    {/* <td>{exp['outputs']?.length}</td> */}
-                    <td>{Object.keys(exp['params']).map((key, index) => (
-                      <ul>
-                        <li>{key}: {exp['params'][key]}</li>
-                      </ul>
-                    ))}</td>
-                    <td>{exp['status']}</td>
+                    {/* <td><ul>{Array.from(exp['outputs']).map((output: string) => {
+                      return (<div>{output}</div>)
+                    })}</ul></td> */}
+                    <td>{Array.from(exp['outputs']).map((x) => (<a href={apiUrl + "/experiments/" + exp['id'] + "/file?" + new URLSearchParams({
+                      'token': token,
+                      'path': x as string
+                    }).toString()} target="_blank">{x as string}</a>))}</td>
+                    <td>{Object.keys(exp['params']).map((key, index) => {
+                      if (Array.from(exp['inputs']).includes(exp['params'][key])) {
+                        return (
+                          <ul>
+                            <li>{key}: <a href={apiUrl + "/experiments/" + exp['id'] + "/file?" + new URLSearchParams({
+                              'token': token,
+                              'path': exp['params'][key]
+                            }).toString()} target="_blank">{exp['params'][key]}</a></li>
+                          </ul>)
+                      } else {
+                        return (
+                          <ul>
+                            <li>{key}: {exp['params'][key]}</li>
+                          </ul>)
+                      }
+                    })}</td>
+                    <td style={{ textTransform: 'capitalize' }}>{exp['status']}</td>
                   </tr>
 
                 ))}
