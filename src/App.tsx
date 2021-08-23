@@ -4,7 +4,7 @@ import categories from './IPP-Experiment_Defintions/categories.json'
 import apps from './IPP-Experiment_Defintions/apps.json'
 import signupFields from './config/signupFields.json'
 import './App.css';
-const apiUrl = 'http://localhost:3330';
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 function App() {
   const loginHandler = (e) => {
