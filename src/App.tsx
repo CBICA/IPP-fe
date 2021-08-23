@@ -4,6 +4,7 @@ import categories from './IPP-Experiment_Defintions/categories.json'
 import apps from './IPP-Experiment_Defintions/apps.json'
 import signupFields from './config/signupFields.json'
 import './App.css';
+const apiUrl = 'http://localhost:3330';
 
 function App() {
   const loginHandler = (e) => {
@@ -83,7 +84,6 @@ function App() {
       .catch(resp => console.error(resp))
   }
 
-  const [apiUrl, setApiUrl] = useState(localStorage.getItem('api_url') || '');
   const [loggedIn, setLogin] = useState(localStorage.getItem('token') !== null);
   const [token, setToken] = useState(localStorage.getItem('token') || (new URLSearchParams(window.location.search).get('token') ?? ''));
   const [signup, setSignup] = useState(false);
@@ -110,7 +110,7 @@ function App() {
       console.error(error)
     })
   }
-  useEffect(fetchExperiments, [token, apiUrl])
+  useEffect(fetchExperiments, [token])
 
   const fetchUser = () => {
     if (!token) {
@@ -130,100 +130,142 @@ function App() {
       console.error(error)
     })
   }
-  useEffect(fetchUser, [token, apiUrl])
+  useEffect(fetchUser, [token])
 
-  if (!apiUrl) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold">
-              Enter a backend server URL
-            </h2>
-          </div>
-          <form className="mt-8 space-y-6" action="#" method="POST" onSubmit={(e) => {
-            e.preventDefault()
-            let url: string = e.target[0].value
-            setApiUrl(url)
-            localStorage.setItem('api_url', url)
-          }}>
-            <div className="rounded-md shadow-sm -space-y-px">
-              <div>
-                <label htmlFor="api_url" className="sr-only">Email address</label>
-                <input id="api_url" name="api_url" type="text" required className="appearance-none relative block w-full px-3 pt-2 border border-gray-300 placeholder-gray-500 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="API URL" />
-              </div>
-            </div>
-            <div>
-              <button type="submit" className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Submit</button>
-            </div>
-          </form>
-        </div>
-      </div>
 
-    )
-  }
   // https://emailregex.com
   const validEmail = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
   if (!loggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div>
-            {/* <img className="mx-auto h-12 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg" alt="Workflow" /> */}
-            <h2 className="mt-6 text-center text-3xl font-extrabold">
-              {(signup) ? 'Create your account' : 'Sign in to your account'}
-            </h2>
-            <p className="mt-2 text-center text-sm">
-              Or <button onClick={() => setSignup(!signup)} className="font-medium text-indigo-600 hover:text-indigo-500"> {(signup) ? 'sign into' : 'create'} an account</button>
-            </p>
-          </div>
-          <div className={"bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative " + (errorMessage === '' ? 'hidden' : '')} role="alert">
-            <strong className="font-bold">Heads up!</strong>
-            <span style={{ textTransform: 'capitalize' }} className="block sm:inline ml-2">{errorMessage}</span>
-            <button type="button" onClick={() => setErrorMessage('')}>
-              <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
-                <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" /></svg>
-              </span>
-            </button>
-          </div>
-          <form className="mt-8 space-y-6" action="#" method="POST" onSubmit={signup ? signupHandler : loginHandler}>
-            <input type="hidden" name="remember" defaultValue="true" />
-            <div className="rounded-md shadow-sm">
-              <div>
-                <label htmlFor="email-address" className="sr-only">Email address</label>
-                <input id="email-address" name="email" type="email" autoComplete="email" required pattern={validEmail} onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Please enter a valid email')} className={"appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 " + (signup ? 'rounded-md' : 'rounded-t-md') + " focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"} placeholder="Email address" />
-              </div>
-              <div className={signup ? 'mt-2' : ''}>
-                <label htmlFor="password" className="sr-only">Password</label>
-                <input id="password" name="password" type="password" autoComplete="current-password" required minLength={6} className={"appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 " + (signup ? 'rounded-md mb-2' : 'rounded-b-md') + " focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"} placeholder="Password" />
-              </div>
-              {(signup) ?
-                <div className="mt-2">
-                  <label htmlFor="confirm-password" className="sr-only">Confirm password</label>
-                  <input name="confirm-password" id="confirm-password" type="password" required={true} minLength={6} className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none rounded-md focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Confirm password" />
-                </div> : ''}
-              {(signup) ?
-                signupFields.map(field => {
-                  switch (field.type) {
-                    case 'textarea':
-                      return (
-                        <div className="mt-2">
-                          <label htmlFor={field.id} className="sr-only">{field.name}</label>
-                          <textarea name={'setting-' + field.id} id={field.id} required={field.required} className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none rounded-md focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder={field.name}></textarea>
-                        </div>)
+      <div className="hero min-h-screen bg-base-200">
 
-                    default:
-                      return (
-                        <div className="mt-2">
-                          <label htmlFor={field.id} className="sr-only">{field.name}</label>
-                          <input name={'setting-' + field.id} id={field.id} type={field.type} required={field.required} pattern={field.pattern} className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none rounded-md focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder={field.name} />
-                        </div>)
-                  }
-                })
-                : ''}
 
+        <div id="tos" className="modal w-full">
+          <div className="modal-box max-w-none w-3/4 overflow-y-scroll max-h-screen">
+            <h1 className="font-extrabold text-4xl text-center">Terms of Service</h1>
+            <p className="text-center mb-2">2021-08-22</p>
+            <h2 className="text-2xl font-bold mb-1 mt-2">Acceptable Data</h2>
+            <p>Do not upload files to the IPP containing Protected Health Information, as defined the federal Health Insurance Portability and Accountability Act (“HIPAA”), or any data that identifies research subjects individually (together, “Personally Identifiable Information” or “PII”).</p>
+            <h2 className="text-2xl font-bold mb-1 mt-2">Data Use and Retention</h2>
+            <ul className="list-disc list-inside">
+              <li>UPHS will not be responsible for safeguarding any PII data that may be accidentally uploaded to the IPP.</li>
+              <li>UPHS will not make any use of images or data uploaded to the IPP, except as necessary to provide the requested image processing services.</li>
+              <li>UPHS will not store data beyond the term needed to perform the image processing as requested by the submitter.</li>
+              <li>UPHS will not store results of processing beyond a short period deemed appropriate by UPHS in its sole discretion to allow such results to be downloaded.</li>
+            </ul>
+            <h2 className="text-2xl font-bold mb-1 mt-2">Terms of Use</h2>
+            <ul className="list-disc list-inside">
+              <li>The party providing data to CBICA for analysis is solely responsible for complying with any restrictions imposed by the original supplier of the data and any applicable laws and regulations, including but not limited to those governing data collection, use, and transfer.</li>
+              <li>Parties submitting data to CBICA for processing agree to use all results generated by the IPP solely for non-commercial use. The term "non-commercial," as applied to use of the CBICA Image Processing Portal, means academic or other scholarly research which (a) is not undertaken for profit, or (b) is not intended to produce work, services, or data for commercial use, or (c) is neither conducted, nor funded, by a person or an entity engaged in a commercial process of medical image analysis. Academic sponsored research is not a commercial use under the terms of this Agreement.</li>
+              <li>The software has been designed for research purposes only and has not been reviewed or approved by the Food and Drug Administration or by any other agency. It is not intended or recommended for clinical applications.</li>
+              <li>UPHS reserves the right to cancel IPP accounts without prior notice. All data associated with cancelled accounts will be removed.</li>
+              <li>Data processing through the IPP is provided on a best effort basis, with no guarantee of timely delivery.</li>
+              <li>Users of the IPP agree to conspicuously acknowledge "CBICA" and the specific analysis method[s] employed through the IPP in any publications resulting from their use of the IPP.</li>
+            </ul>
+            <p className="mt-2">Revision 1.2, Wed Aug  12 13:04:00 EDT 2015</p>
+            <div className="modal-action">
+              <a href={window.location.href.split('#')[0] + "#"} className="btn btn-primary">Close</a>
             </div>
-            {/* <div className="flex items-center justify-between">
+          </div>
+        </div>
+
+
+        <div className="flex-col justify-center hero-content lg:flex-row">
+          <div className="text-center lg:text-left">
+            <h1 className="mb-5 text-5xl font-bold">
+              Welcome!
+            </h1>
+            <p className="mb-5">
+              The CBICA Image Processing Portal is available for authorized users to access the Center for Biomedical Image Computing and Analytics computing cluster and imaging analytics pipelines on their own, free of charge, without the need to download and install any of our software. In this first phase of the project, we have provided a limited set of well streamlined pipelines covering methods of broad interest. We welcome your suggestions to adapt these pipelines to suit your specific needs.
+            </p>
+            <p className="mb-5">
+              Many CBICA image processing algorithms and pre-processing tools are available for stand-alone use through the Cancer Imaging Phenomics Toolkit (CaPTk) software package. This open-source software is designed for general-purpose quantitative medical image analysis and specialized diagnostics (such as survival and recurrence prediction of glioblastoma) and is now available for download at: <a href="https://www.cbica.upenn.edu/captk" target="_blank" className="link link-accent">https://www.cbica.upenn.edu/captk</a>
+            </p>
+            <p className="mb-5">
+              If you use our pipelines in your own publication we ask that you cite our respective publications. Moreover, we ask that you cite the portal as follows:
+            </p>
+            <p className="mb-5">
+              <blockquote className="border-l-4 pl-3">CBICA Image Processing Portal; https://ipp.cbica.upenn.edu/.  A web accessible platform for imaging analytics; Center for Biomedical Image Computing and Analytics, University of Pennsylvania.</blockquote>
+            </p>
+            <div className="w-full carousel rounded-box">
+              <div className="carousel-item w-1/2">
+                <img src="/837739763739754523-img04.full.jpg" className="w-full" />
+              </div>
+              <div className="carousel-item w-1/2">
+                <img src="/72100511629801360-img05.full.jpg" className="w-full" />
+              </div>
+              <div className="carousel-item w-1/2">
+                <img src="/549317001114620719-img06.full.jpg" className="w-full" />
+              </div>
+              <div className="carousel-item w-1/2">
+                <img src="/604887918702357499-img07.full.jpg" className="w-full" />
+              </div>
+            </div>
+            <p className="text-sm mt-2">Center for Biomedical Image Computing and Analytics, University of Pennsylvania &middot; <a href="mailto:ipp-support@cbica.upenn.edu" className="link link-primary">Contact</a> &middot; <a href="http://www.cbica.upenn.edu/" target="_blank" rel="noreferrer" className="link link-primary">About</a></p>
+          </div>
+          <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+            <div className="card-body">
+              <div className={"bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative " + (errorMessage === '' ? 'hidden' : '')} role="alert">
+                <strong className="font-bold">Heads up!</strong>
+                <span style={{ textTransform: 'capitalize' }} className="block sm:inline ml-2">{errorMessage}</span>
+                <button type="button" onClick={() => setErrorMessage('')}>
+                  <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+                    <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" /></svg>
+                  </span>
+                </button>
+              </div>
+              <h2 className="card-title text-2xl text-center mb-1">
+                {(signup) ? 'Create your account' : 'Sign in to your account'}
+              </h2>
+              <p className="mt-2 text-center text-sm">
+                <div className="divider text-sm m-0 mb-2">Or <button onClick={() => setSignup(!signup)} className="btn btn-secondary btn-xs ml-2"> {(signup) ? 'sign into' : 'create'} an account</button></div>
+              </p>
+
+              <form className="mt-2" action="#" method="POST" onSubmit={signup ? signupHandler : loginHandler}>
+                <input type="hidden" name="remember" defaultValue="true" />
+                <div className="form-control">
+                  <label htmlFor="email-address" className="sr-only">Email address</label>
+                  <input id="email-address" name="email" type="email" autoComplete="email" required pattern={validEmail} onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Please enter a valid email')} className="input input-bordered" placeholder="Email address" />
+                </div>
+                <div className="mt-2 form-control">
+                  <label htmlFor="password" className="sr-only">Password</label>
+                  <input id="password" name="password" type="password" autoComplete="current-password" required minLength={6} className="input input-bordered" placeholder="Password" />
+                </div>
+                {(signup) ?
+                  <div className="mt-2 form-control">
+                    <label htmlFor="confirm-password" className="sr-only">Confirm password</label>
+                    <input name="confirm-password" id="confirm-password" type="password" required={true} minLength={6} className="input input-bordered" placeholder="Confirm password" />
+                  </div> : ''}
+                {(signup) ?
+                  signupFields.map(field => {
+                    switch (field.type) {
+                      case 'textarea':
+                        return (
+                          <div className="mt-2 form-control">
+                            <label htmlFor={field.id} className="sr-only">{field.name}</label>
+                            <textarea name={'setting-' + field.id} id={field.id} required={field.required} className="textarea textarea-bordered" placeholder={field.name}></textarea>
+                          </div>)
+
+                      default:
+                        return (
+                          <div className="mt-2 form-control">
+                            <label htmlFor={field.id} className="sr-only">{field.name}</label>
+                            <input name={'setting-' + field.id} id={field.id} type={field.type} required={field.required} pattern={field.pattern} className="input input-bordered" placeholder={field.name} />
+                          </div>)
+                    }
+                  })
+                  : ''}
+
+                {(signup) ?
+                  <div className="mt-2 form-control">
+                    <label className="cursor-pointer label">
+                      <span className="label-text">Agree to <a href="#tos" className="link link-primary">terms of service</a></span>
+
+                      <input id="tos-check" type="checkbox" required={true} className="checkbox checkbox-primary" />
+                    </label>
+                  </div> : ''}
+
+                {/* <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input id="remember_me" name="remember_me" type="checkbox" className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
                 <label htmlFor="remember_me" className="ml-2 block text-sm text-gray-900">
@@ -236,31 +278,36 @@ function App() {
                 </a>
               </div>
             </div> */}
-            <div>
-              <button type="submit" className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                  {/* Heroicon name: solid/lock-closed */}
-                  <svg className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                  </svg>
-                </span>
-                Sign {(signup) ? 'up' : 'in'}
-              </button>
+                <div className="form-control mt-6">
+                  <button className="group relative flex justify-center btn btn-primary btn-block mt-2">
+                    {/* Heroicon name: solid/lock-closed */}
+                    <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                      <svg className="h-5 w-5 text-gray-900 opacity-20 mix-blend-multiply" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                      </svg>
+                    </span>
+                    Sign {(signup) ? 'up' : 'in'}
+                  </button>
+
+                </div>
+              </form>
+
             </div>
-          </form>
+          </div>
         </div>
-      </div>
+      </div >
+
 
     )
   }
 
   return (
-    <div className="md:flex flex-col md:flex-row md:min-h-screen w-full">
+    <div className="md:flex flex-col md:flex-row md:min-h-screen w-full bg-base-200 overflow-y-auto">
       <div className="flex flex-col w-auto py-4 px-2">
 
 
 
-        <div className="artboard artboard-demo bg-base-200">
+        <div className="artboard artboard-demo">
           <ul className="menu py-4 shadow-lg bg-base-100 rounded-box w-full overflow-visible">
             <li className="menu-title">
               <span>
@@ -282,7 +329,7 @@ function App() {
                       </svg>
                       {categories[cat].label}
                     </a>
-                    <ol className="shadow menu dropdown-content bg-base-100 w-full pl-0">
+                    <ol className="shadow-lg menu dropdown-content bg-base-100 w-full pl-0">
                       <li>
                         {categories[cat].apps.map((app: string) => (
                           <a href="#" onClick={() => { setApp(app) }} className="block px-4 py-2 mt-2 text-sm font-semibold bg-transparent rounded dark-mode:bg-transparent dark-mode:hover:bg-gray-600 dark-mode:focus:bg-gray-600 dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:text-gray-200 md:mt-0 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline">{app}</a>
@@ -305,7 +352,7 @@ function App() {
 
       <div className="flex flex-col w-full py-4 px-2">
 
-        <div className="navbar mb-2 shadow-lg bg-neutral text-neutral-content rounded-box">
+        <div className="navbar mb-2 shadow-lg bg-base-100 rounded-box">
           <div className="flex-1 px-2 mx-2">
             <span className="text-lg font-bold">
               Image Processing Portal
@@ -320,13 +367,16 @@ function App() {
                 Apps
 
               </a>
-              <a onClick={() => setPage('experiments')} className="btn btn-ghost btn-sm rounded-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 mr-2 stroke-current">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                </svg>
-                Experiments
+              <div className="indicator">
+                <div className={"indicator-item badge badge-secondary" + (experiments.length === 0 ? ' hidden' : '')}>{experiments.length}</div>
+                <a onClick={() => setPage('experiments')} className="btn btn-ghost btn-sm rounded-btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 mr-2 stroke-current">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                  </svg>
+                  Experiments
 
-              </a>
+                </a>
+              </div>
             </div>
           </div>
           <div className="flex-none">
@@ -340,31 +390,22 @@ function App() {
                 {/* <li>
                   <a>Item 1</a>
                 </li> */}
-                <li>
+                <li className="p-5">
                   <form action="#">
-                    <label className="inline-flex items-center">
-                      <input type="checkbox" />
-                      <span className="ml-2">Email notifications</span>
-                    </label>
+                    <div className="form-control">
+                      <label className="cursor-pointer label">
+                        <span className="label-text">Email notifications</span>
+                        <input type="checkbox" className="checkbox checkbox-primary" />
+                      </label>
+                    </div>
                   </form>
                 </li>
-                <li>
+                <li className="p-5">
                   <form action="#">
-                    <label className="inline-flex items-center">
-                      <input type="checkbox" />
-                      <span className="ml-2">Slack notifications</span>
-                    </label>
-                  </form>
-                </li>
-                <li>
-                  <form action="#">
-                    <div className="block px-4 py-2 text-sm" role="menuitem" id="user-menu-item-3">
-                      <label className="block">
-                        <span>Backend server</span>
-                        <select className="block w-full mt-0 px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black">
-                          <option value="CBICA">CBICA server</option>
-                          <option value="localhost">Your computer</option>
-                        </select>
+                    <div className="form-control">
+                      <label className="cursor-pointer label">
+                        <span className="label-text">Slack notifications</span>
+                        <input type="checkbox" className="checkbox checkbox-primary" />
                       </label>
                     </div>
                   </form>
@@ -417,12 +458,16 @@ function App() {
                       )
                     case 'select':
                       return (
-                        <select name={field} className="select select-bordered select-primary w-full">
-                          <option disabled={true} selected={true}>{combined[field]?.label}</option>
-                          {Object.keys((combined[field]) ? combined[field].choices : {}).map((choice: string) => (
-                            <option value={choice}>{combined[field]?.choices[choice]}</option>
-                          ))}
-                        </select>
+                        <div className="form-control">
+                          <label className="label">
+                            <span className="label-text">{combined[field]?.label}</span>
+                          </label>
+                          <select name={field} className="select select-bordered select-primary w-full">
+                            {Object.keys((combined[field]) ? combined[field].choices : {}).map((choice: string) => (
+                              <option value={choice}>{combined[field]?.choices[choice]}</option>
+                            ))}
+                          </select>
+                        </div>
                       )
 
                     // return (
@@ -447,12 +492,16 @@ function App() {
                     //   console.log(app.fieldGroups.required.fields[field].type)
                   }
                 })}
-                <select name="host" className="select select-bordered select-primary w-full">
-                  <option disabled={true} selected={true}>Execute host</option>
-                  <option value="localhost">Localhost</option>
-                  <option value="cubic">CUBIC</option>
-                  <option value="cbica1">IPP server</option>
-                </select>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Execute host</span>
+                  </label>
+                  <select name="host" className="select select-bordered select-primary w-full">
+                    <option value="cubic">CUBIC</option>
+                    <option value="localhost">Localhost</option>
+                    <option value="cbica1">IPP server</option>
+                  </select>
+                </div>
               </div>
               <label className="block mt-3">
                 <button className="btn btn-primary" type="submit">Submit</button>
