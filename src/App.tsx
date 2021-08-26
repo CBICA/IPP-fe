@@ -132,9 +132,6 @@ function App() {
   }
   useEffect(fetchUser, [token])
 
-
-  // https://emailregex.com
-  const validEmail = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
   if (!loggedIn) {
     return (
       <div className="hero min-h-screen bg-base-200">
@@ -143,7 +140,7 @@ function App() {
         <div id="tos" className="modal w-full">
           <div className="modal-box max-w-none w-3/4 overflow-y-scroll max-h-screen">
             <h1 className="font-extrabold text-4xl text-center">Terms of Service</h1>
-            <p className="text-center mb-2">2021-08-22</p>
+            <p className="text-center mb-2">{new Date().toISOString().split('T')[0]}</p>
             <h2 className="text-2xl font-bold mb-1 mt-2">Acceptable Data</h2>
             <p>Do not upload files to the IPP containing Protected Health Information, as defined the federal Health Insurance Portability and Accountability Act (“HIPAA”), or any data that identifies research subjects individually (together, “Personally Identifiable Information” or “PII”).</p>
             <h2 className="text-2xl font-bold mb-1 mt-2">Data Use and Retention</h2>
@@ -189,16 +186,16 @@ function App() {
             </p>
             <div className="w-full carousel rounded-box">
               <div className="carousel-item w-1/2">
-                <img src="/837739763739754523-img04.full.jpg" className="w-full" />
+                <img src="https://ipp.cbica.upenn.edu/uploads/files/837739763739754523-img04.full.jpg" className="w-full" />
               </div>
               <div className="carousel-item w-1/2">
-                <img src="/72100511629801360-img05.full.jpg" className="w-full" />
+                <img src="https://ipp.cbica.upenn.edu/uploads/files/72100511629801360-img05.full.jpg" className="w-full" />
               </div>
               <div className="carousel-item w-1/2">
-                <img src="/549317001114620719-img06.full.jpg" className="w-full" />
+                <img src="https://ipp.cbica.upenn.edu/uploads/files/549317001114620719-img06.full.jpg" className="w-full" />
               </div>
               <div className="carousel-item w-1/2">
-                <img src="/604887918702357499-img07.full.jpg" className="w-full" />
+                <img src="https://ipp.cbica.upenn.edu/uploads/files/604887918702357499-img07.full.jpg" className="w-full" />
               </div>
             </div>
             <p className="text-sm mt-2">Center for Biomedical Image Computing and Analytics, University of Pennsylvania &middot; <a href="mailto:ipp-support@cbica.upenn.edu" className="link link-primary">Contact</a> &middot; <a href="http://www.cbica.upenn.edu/" target="_blank" rel="noreferrer" className="link link-primary">About</a></p>
@@ -214,18 +211,19 @@ function App() {
                   </span>
                 </button>
               </div>
+
+              <p className="mt-2 text-center text-sm">
+                <div className="divider text-sm m-0 mb-2 uppercase"><button onClick={() => setSignup(!signup)} className="btn btn-secondary btn-xs mr-2"> {(signup) ? 'Sign in' : 'Create an account'}</button> or</div>
+              </p>
               <h2 className="card-title text-2xl text-center mb-1">
                 {(signup) ? 'Create your account' : 'Sign in to your account'}
               </h2>
-              <p className="mt-2 text-center text-sm">
-                <div className="divider text-sm m-0 mb-2">Or <button onClick={() => setSignup(!signup)} className="btn btn-secondary btn-xs ml-2"> {(signup) ? 'sign into' : 'create'} an account</button></div>
-              </p>
 
               <form className="mt-2" action="#" method="POST" onSubmit={signup ? signupHandler : loginHandler}>
                 <input type="hidden" name="remember" defaultValue="true" />
                 <div className="form-control">
                   <label htmlFor="email-address" className="sr-only">Email address</label>
-                  <input id="email-address" name="email" type="email" autoComplete="email" required pattern={validEmail} onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Please enter a valid email')} className="input input-bordered" placeholder="Email address" />
+                  <input id="email-address" name="email" type="email" autoComplete="email" required onInvalid={e => (e.target as HTMLInputElement).setCustomValidity('Please enter a valid email')} className="input input-bordered" placeholder="Email address" />
                 </div>
                 <div className="mt-2 form-control">
                   <label htmlFor="password" className="sr-only">Password</label>
@@ -295,7 +293,7 @@ function App() {
             </div>
           </div>
         </div>
-      </div >
+      </div>
 
 
     )
