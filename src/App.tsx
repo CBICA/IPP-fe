@@ -56,9 +56,13 @@ function App() {
           setSignup(false)
         } else {
           console.error(resp.data.error)
+          setErrorMessage(resp.data.error)
         }
       })
-      .catch(resp => console.error(resp))
+      .catch(resp => {
+        setErrorMessage(resp.message)
+        console.error(resp)
+      })
   }
 
   const appHandler = (e) => {
@@ -140,7 +144,7 @@ function App() {
         <div id="tos" className="modal w-full">
           <div className="modal-box max-w-none w-3/4 overflow-y-scroll max-h-screen">
             <h1 className="font-extrabold text-4xl text-center">Terms of Service</h1>
-            <p className="text-center mb-2">{new Date().toISOString().split('T')[0]}</p>
+            <p className="text-center mb-2">2015-08-12</p>
             <h2 className="text-2xl font-bold mb-1 mt-2">Acceptable Data</h2>
             <p>Do not upload files to the IPP containing Protected Health Information, as defined the federal Health Insurance Portability and Accountability Act (“HIPAA”), or any data that identifies research subjects individually (together, “Personally Identifiable Information” or “PII”).</p>
             <h2 className="text-2xl font-bold mb-1 mt-2">Data Use and Retention</h2>
